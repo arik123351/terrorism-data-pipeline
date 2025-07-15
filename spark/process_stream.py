@@ -60,3 +60,6 @@ def process_stream():
         .start()
 
     query.awaitTermination()
+
+if __name__ == "__main__":
+    process_stream()

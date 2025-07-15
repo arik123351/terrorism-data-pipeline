@@ -2,7 +2,7 @@ import json
 import time
 import csv
 import kafka
-import kagglehub
+import subprocess
 import glob
 import os
 from datetime import datetime
@@ -31,9 +31,19 @@ def create_kafka_producer():
 def send_terrorism_data():
     """Send terrorism data to Kafka with improved error handling"""
     try:
-        # Locate the latest GTD dataset
-        path = kagglehub.dataset_download("START-UMD/gtd")
-        csv_path = glob.glob(os.path.join(path, "**", "gtd.csv"), recursive=True)[0]
+        # Download the latest GTD dataset using the official Kaggle API
+        data_dir = os.path.join(os.getcwd(), "data")
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+        kaggle_cmd = [
+            "kaggle", "datasets", "download", "-d", "START-UMD/gtd", "-p", data_dir, "--unzip"
+        ]
+        try:
+            subprocess.run(kaggle_cmd, check=True)
+        except Exception as e:
+            logger.error(f"Failed to download dataset from Kaggle: {e}")
+            return
+        csv_path = glob.glob(os.path.join(data_dir, "**", "gtd.csv"), recursive=True)[0]
         
         producer = create_kafka_producer()
         if not producer:
@@ -80,3 +90,6 @@ def send_terrorism_data():
         
     except Exception as e:
         logger.error(f"Error in send_terrorism_data: {e}")
+
+if __name__ == "__main__":
+    send_terrorism_data()

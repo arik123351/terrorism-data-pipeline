@@ -22,7 +22,6 @@ def write_to_elasticsearch():
         .config("spark.es.nodes", "localhost") \
         .config("spark.es.port", "9200") \
         .config("spark.es.resource", "terrorism/_doc") \
-        .config("spark.es.nodes.wan.only", "true") \
         .config("spark.es.batch.size.entries", "1000") \
         .config("spark.es.batch.size.bytes", "1mb") \
         .config("spark.es.batch.write.refresh", "false") \
@@ -56,3 +55,6 @@ def write_to_elasticsearch():
         .option("es.mapping.id", "eventid") \
         .trigger(processingTime='30 seconds') \
         .start()
+
+if __name__ == "__main__":
+    write_to_elasticsearch()
